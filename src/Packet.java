@@ -7,7 +7,7 @@
  * @Date: 10/4/2014
  * 
  */
-public class Packet {
+public class Packet implements Comparable<Packet> {
 	
 	private String pktId; // 32 bit UUID
 	private int pktSize; // bits
@@ -54,6 +54,11 @@ public class Packet {
 	@Override
 	public String toString(){
 		return pktId + "\t" + pktSize + "bits" + "\t" + "@" + pktArrivalTime;
+	}
+
+	@Override
+	public int compareTo(Packet o) {
+		return Double.compare(this.pktArrivalTime, o.getPktArrivalTime());
 	}
 	
 }
