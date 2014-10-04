@@ -1,8 +1,11 @@
 
 /**
+ * 
  * Event class for scheduling.
  * @author Feiyu Shi
- * Date: 10/4/2014
+ * @collaborator Rakshit Sachdev
+ * @Date: 10/4/2014
+ * 
  */
 public class Event implements Comparable<Event> {
 
