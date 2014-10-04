@@ -13,10 +13,9 @@ import java.util.UUID;
  */
 public class Source {
 	
-	private int sourceType;
+	private String sourceType;
 	private int avgPktSize;
 	private double avgInterarrivalTime;
-//	private long totalNumOfPkts;
 	
 	/**
 	 * Constructor.
@@ -25,17 +24,16 @@ public class Source {
 	 * @param totalNumOfPkts
 	 * @throws Exception
 	 */
-	public Source(int expNumber, int sourceType, long totalNumOfPkts) throws Exception{
+	public Source(int expNumber, String sourceType, long totalNumOfPkts) throws Exception{
 		this.sourceType = sourceType;
-//		this.totalNumOfPkts = totalNumOfPkts;
 		
-		if(this.sourceType == Constants.TELNET){
+		if(this.sourceType.equals(Constants.TELNET)){
 			this.avgPktSize = Constants.TELNET_PKT_SIZE_AVG;
 			this.avgInterarrivalTime = this.avgPktSize / Constants.TELNET_FTP_DATA_GENERATION_RATE[expNumber];
-		}else if(this.sourceType == Constants.FTP){
+		}else if(this.sourceType.equals(Constants.FTP)){
 			this.avgPktSize = Constants.FTP_PKT_SIZE_AVG;
 			this.avgInterarrivalTime = this.avgPktSize / Constants.TELNET_FTP_DATA_GENERATION_RATE[expNumber];
-		}else if(this.sourceType == Constants.ROGUE){
+		}else if(this.sourceType.equals(Constants.ROGUE)){
 			this.avgPktSize = Constants.ROGUE_PKT_SIZE_AVG;
 			this.avgInterarrivalTime = this.avgPktSize / Constants.ROGUE_DATA_GENERATION_RATE;
 		}else{
@@ -71,6 +69,11 @@ public class Source {
 			lastPktArrivalTime = curPktArrivalTime;
 		}
 		return pktQueue;
+	}
+	
+	@Override
+	public String toString(){
+		return sourceType + "\t" + "avg pkt size: " + avgPktSize + "bits" + "\t" + "avg interarrival time: " + avgInterarrivalTime;
 	}
 
 }

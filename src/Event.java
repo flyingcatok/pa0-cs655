@@ -10,31 +10,59 @@
 public class Event implements Comparable<Event> {
 
 	private double scheduledTime;
-	private int eventName;
+	private String eventName;
+	private Packet packet;
 	
-	public Event(double scheduledTime, int eventName){
+	/**
+	 * Constructor
+	 * @param scheduledTime double
+	 * @param eventName String
+	 */
+	public Event(double scheduledTime, String eventName){
 		this.scheduledTime = scheduledTime;
 		this.eventName = eventName;
 	}
 	
+	/**
+	 * Getter for scheduledTime.
+	 * @return double
+	 */
 	public double getScheduledTime(){
 		return this.scheduledTime;
 	}
 	
-	public int getEventName(){
+	/**
+	 * Getter for eventName.
+	 * @return String
+	 */
+	public String getEventName(){
 		return this.eventName;
 	}
-	
-	public void setScheduledTime(double scheduledTime){
-		this.scheduledTime = scheduledTime;
-	}
-	
-	public void setEventName(int eventName){
-		this.eventName = eventName;
-	}
 
+	/**
+	 * Setter for packet.
+	 * @param packet Packet
+	 */
+	public void setPacket(Packet packet){
+		this.packet = packet;
+	}
+	
+	/**
+	 * Getter for packet.
+	 * @return Packet
+	 */
+	public Packet getPacket(){
+		return this.packet;
+	}
+	
 	@Override
 	public int compareTo(Event o) {
 		return Double.compare(this.scheduledTime, o.getScheduledTime());
 	}
+	
+	@Override
+	public String toString(){
+		return this.scheduledTime + "\t|\t" + this.eventName;
+	}
+	
 }
