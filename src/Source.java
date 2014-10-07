@@ -21,10 +21,9 @@ public class Source {
 	 * Constructor.
 	 * @param expNumber experiment number
 	 * @param sourceType TELNET, FTP or ROGUE
-	 * @param totalNumOfPkts
 	 * @throws Exception
 	 */
-	public Source(int expNumber, String sourceType, long totalNumOfPkts) throws Exception{
+	public Source(int expNumber, String sourceType) throws Exception{
 		this.sourceType = sourceType;
 		
 		if(this.sourceType.equals(Constants.TELNET)){
@@ -46,7 +45,7 @@ public class Source {
 	 * @param lambda double
 	 * @return double
 	 */
-	private double getExpoRanNum(double lambda){
+	public double getExpoRanNum(double lambda){
 		Random uniRandom = new Random();
 		double r = uniRandom.nextDouble();
 		return -Math.log(1-r)/lambda;
@@ -62,8 +61,8 @@ public class Source {
 		
 		for(int i = 0; i < totalNumOfPkts; i++){
 			String uuid = UUID.randomUUID().toString().replaceAll("-", "");
-			double curPktArrivalTime = lastPktArrivalTime + getExpoRanNum(avgInterarrivalTime);
-			int curPktSize = (int)getExpoRanNum(avgPktSize);
+			double curPktArrivalTime = lastPktArrivalTime + getExpoRanNum(1.0/avgInterarrivalTime);
+			int curPktSize = (int)getExpoRanNum(1.0/avgPktSize);
 			Packet pkt = new Packet(uuid,curPktSize,curPktArrivalTime);
 			pktQueue.add(pkt);
 			lastPktArrivalTime = curPktArrivalTime;
