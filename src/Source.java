@@ -45,7 +45,7 @@ public class Source {
 	 * @param lambda double
 	 * @return double
 	 */
-	public double getExpoRanNum(double lambda){
+	private double getExpoRanNum(double lambda){
 		Random uniRandom = new Random();
 		double r = uniRandom.nextDouble();
 		return -Math.log(1-r)/lambda;
