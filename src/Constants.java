@@ -25,13 +25,16 @@ public final class Constants {
 	public static final int FTP_PKT_SIZE_AVG = 8192; //bits
 	public static final String ROGUE = "ROGUE";
 	public static final int ROGUE_PKT_SIZE_AVG = 5000; //bits
-	public static final int SOURCE_TRANSMISSION_RATE = 1; //bit
+	public static final int TRANSMISSION_RATE = 1; //bit/s
 	public static final double[] TELNET_FTP_DATA_GENERATION_RATE = {0.04,0.06,0.08,0.1,0.12,0.14,0.16,0.18,0.2};
-	public static final double ROGUE_DATA_GENERATION_RATE = 0.5;
+	public static final double ROGUE_DATA_GENERATION_RATE = 0.5*TRANSMISSION_RATE;
 	
 	// algorithms
 	public final static String FIFO = "FIFO";
 	public final static String RR = "RR";
 	public final static String DRR = "DRR";
+	
+	// simulation
+	public final static int TOTAL_PKTS_IN_SIMULATION = 100000;
 	
 }
