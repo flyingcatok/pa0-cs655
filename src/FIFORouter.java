@@ -34,6 +34,7 @@ public class FIFORouter implements Simulator {
 		this.FIFOPkts = new LinkedList<Packet>( temp.subList(0, Constants.TOTAL_PKTS_IN_SIMULATION));
 	}
 	
+	@Override
 	public void initSchedule(){
 		// schedule first monitor
 //		this.schedule.add(new Event(0.0,Constants.LOG));
@@ -51,6 +52,7 @@ public class FIFORouter implements Simulator {
 		this.schedule.add(death);
 	}
 	
+	@Override
 	public void birth(Event birthEvent){
 		// add newly-born request to FIFO queue
 		Packet pkt = birthEvent.getPacket();
@@ -68,6 +70,7 @@ public class FIFORouter implements Simulator {
 			
 	}
 	
+	@Override
 	public void death(Event deathEvent){
 		// remove the pkt from queue
 		Packet pkt = this.FIFOQueue.poll();
@@ -105,13 +108,6 @@ public class FIFORouter implements Simulator {
 		
 	}
 	
-//	public void log(Event logEvent){
-//		System.out.println("log");
-//		Event nextLogEvent = new Event(logEvent.getScheduledTime()+100, Constants.LOG);
-//		this.schedule.add(nextLogEvent);
-//		Collections.sort(this.schedule);
-//	}
-	
 	private Event findNextBirthEventInSchedule(LinkedList<Event> schedule){
 		LinkedList<Event> temp = new LinkedList<Event>(schedule);
 		Event e = temp.poll();
@@ -122,6 +118,8 @@ public class FIFORouter implements Simulator {
 		}
 		
 	}
+	
+	@Override
 	public void controller(){
 		// initialize schedule
 		initSchedule();
@@ -135,35 +133,31 @@ public class FIFORouter implements Simulator {
 			writer.println("<-------------------- FIFO router queuing system schedule -------------------->");
 			writer.println("Time"+"\t\t\t|\t"+"Event"+"\t\t|\t"+"Pkt ID"+"\t\t\t\t\t"+"Pkt Size"+"\t"+"Pkt Arrival Time");
 		
-		while(this.schedule.size()!=0){
-			Event currEvent = this.schedule.poll();
-			String currEventName = currEvent.getEventName();
-			switch(currEventName){
-			case Constants.PKT_ARV:
-				birth(currEvent);
-				writer.println(currEvent.toString());
-				break;
-			case Constants.PKT_TXED:
-				death(currEvent);
-				writer.println(currEvent.toString());
-				break;
-			default:
-				try {
-					throw new Exception("No events in the schedule!");
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+			while(this.schedule.size()!=0){
+				Event currEvent = this.schedule.poll();
+				String currEventName = currEvent.getEventName();
+				switch(currEventName){
+				case Constants.PKT_ARV:
+					birth(currEvent);
+					writer.println(currEvent.toString());
+					break;
+				case Constants.PKT_TXED:
+					death(currEvent);
+					writer.println(currEvent.toString());
+					break;
+				default:
+					try {
+						throw new Exception("No events in the schedule!");
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 				}
-				
 			}
-		}
-		writer.println("<---------- End of FIFO router queuing system schedule ---------->");
-		writer.close();
+			writer.println("<---------- End of FIFO router queuing system schedule ---------->");
+			writer.close();
 		} catch (FileNotFoundException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		} catch (UnsupportedEncodingException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 	}
