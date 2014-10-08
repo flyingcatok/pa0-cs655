@@ -17,10 +17,8 @@ import java.util.List;
 public class RRRouter implements Simulator {
 
 	private LinkedList<Event> schedule = new LinkedList<Event>();
-	private LinkedList<Packet> RRQueue = new LinkedList<Packet>();
 	private List<Flow> flows;
 	private LinkedList<Packet> RRPkts = new LinkedList<Packet>();
-	private int totalPktInSystem;
 	private int expNumber;
 	
 	/**
@@ -29,8 +27,8 @@ public class RRRouter implements Simulator {
 	 * @throws Exception Source Type Error.
 	 */
 	public RRRouter(int expNumber) throws Exception{
-		this.totalPktInSystem = 0;
-		this.flows = new IncomingFlows(expNumber, 20).getIncomingFlows();
+//		this.totalPktInSystem = 0;
+		this.flows = new IncomingFlows(expNumber, 5).getIncomingFlows();
 		this.expNumber = expNumber;
 		LinkedList<Packet> temp = new LinkedList<Packet>();
 		for(int i = 0; i < this.flows.size(); i++){
@@ -58,7 +56,6 @@ public class RRRouter implements Simulator {
 	@Override
 	public void initSchedule() {
 		// schedule first birth
-//		Packet firstPkt = getFirstPacketFromFlows();
 		Packet firstPkt = this.RRPkts.poll();
 		double pktArrivaltime = firstPkt.getPktArrivalTime();
 		Event birth = new Event(pktArrivaltime,Constants.PKT_ARV);
@@ -77,20 +74,12 @@ public class RRRouter implements Simulator {
 		// schedule the next birth
 		if(this.RRPkts.size() != 0){
 			Packet nextPkt = this.RRPkts.poll();
-			this.totalPktInSystem++;
+			
 			double nextBirthTime = nextPkt.getPktArrivalTime();
 			Event nextBirthEvent = new Event(nextBirthTime, Constants.PKT_ARV);
 			nextBirthEvent.setPacket(nextPkt);
 			this.schedule.add(nextBirthEvent);
 			Collections.sort(this.schedule);
-		}
-		
-		// check if only 1 packet in system, schedule death event
-		if(this.totalPktInSystem == 1){
-			double nextDeathTime = birthEvent.getScheduledTime();
-			Event death = new Event(nextDeathTime, Constants.PKT_TXED);
-			death.setPacket(birthEvent.getPacket());
-			this.schedule.add(death);
 		}
 	}
 
@@ -101,32 +90,55 @@ public class RRRouter implements Simulator {
 		
 		// dequeue current pkt from flow
 		this.flows.get(currFlowId).getPkts().poll();
-		this.totalPktInSystem--;
+
 		// get transmission End Time
 		double timeOnSchedule = deathEvent.getScheduledTime();
 		double transmissionEndTime = timeOnSchedule + pkt.getpktSize() / Constants.TRANSMISSION_RATE;
-		
-		// schedule next death event
-		checkNextQueueForDeathEvent(currFlowId, transmissionEndTime);
-	}
 
-	private void checkNextQueueForDeathEvent(int currFlowId, double transmissionEndTime){
-		if(this.totalPktInSystem == 0){
+		// schedule next death event
+		int nextFlowId = (currFlowId + 1) % this.flows.size();
+		checkNextQueueForDeathEvent(nextFlowId, transmissionEndTime, 1);
+	}
+	
+	private void checkNextQueueForDeathEvent(int currFlowId, double transmissionEndTime, int counter){
+
+		int counterTemp = counter;
+		if(counterTemp % 11 ==0){
+			// schedule next death event
+			if(this.schedule.size()!=0){
+				Event birth = this.schedule.peek();
+				double time = birth.getScheduledTime();
+				Event death = new Event(time, Constants.PKT_TXED);
+				death.setPacket(birth.getPacket());
+				this.schedule.add(death);
+				Collections.sort(this.schedule);
+			}
+			
 			return;
 		}
 		// check next queue, if there is a packet there
-		int nextFlowId = (currFlowId + 1) % this.flows.size();
-		Packet nextFlowFirstPkt = this.flows.get(nextFlowId).getPkts().peek();
-		double nextFlowFirstPktArrivalTime = nextFlowFirstPkt.getPktArrivalTime();
+		if(this.flows.get(currFlowId).getPkts().size()!=0){
+			Packet nextFlowFirstPkt = this.flows.get(currFlowId).getPkts().peek();
+			double nextFlowFirstPktArrivalTime = nextFlowFirstPkt.getPktArrivalTime();
 
-		if(nextFlowFirstPktArrivalTime <= transmissionEndTime){
-			double nextDeathTime = transmissionEndTime;
-			Event nextDeathEvent = new Event(nextDeathTime, Constants.PKT_TXED);
-			nextDeathEvent.setPacket(nextFlowFirstPkt);
-			return;
+			if(nextFlowFirstPktArrivalTime <= transmissionEndTime){
+				double nextDeathTime = transmissionEndTime;
+				Event nextDeathEvent = new Event(nextDeathTime, Constants.PKT_TXED);
+				nextDeathEvent.setPacket(nextFlowFirstPkt);
+				this.schedule.add(nextDeathEvent);
+				Collections.sort(this.schedule);
+				return;
+			}else{
+				int nextFlowId = (currFlowId + 1) % this.flows.size();
+				counterTemp++;
+				checkNextQueueForDeathEvent(nextFlowId, transmissionEndTime, counterTemp);	
+			}
 		}else{
-			checkNextQueueForDeathEvent(nextFlowId, transmissionEndTime);	
+			int nextFlowId = (currFlowId + 1) % this.flows.size();
+			counterTemp++;
+			checkNextQueueForDeathEvent(nextFlowId, transmissionEndTime, counterTemp);	
 		}
+		
 	}
 	
 	@Override
@@ -141,7 +153,7 @@ public class RRRouter implements Simulator {
 			PrintWriter writer = new PrintWriter(ith.concat("_schedule.txt"), "UTF-8");
 				
 			writer.println("<-------------------- RR router queuing system schedule -------------------->");
-			writer.println("Time"+"\t\t\t|\t"+"Event"+"\t\t|\t"+"Pkt ID"+"\t\t\t\t\t"+"Pkt Size"+"\t"+"Pkt Arrival Time");
+			writer.println("Time"+"\t\t\t|\t"+"Event"+"\t\t|\t"+"Flow ID"+"\t\t\t\t\t"+"Pkt Size"+"\t"+"Pkt Arrival Time");
 				
 			while(this.schedule.size()!=0){
 				Event currEvent = this.schedule.poll();
