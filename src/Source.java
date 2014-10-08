@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -55,9 +56,9 @@ public class Source {
 	 * Generate packets from this source.
 	 * @return List<Packet>
 	 */
-	public List<Packet> generatePakets(long totalNumOfPkts){
+	public LinkedList<Packet> generatePakets(long totalNumOfPkts){
 		double lastPktArrivalTime = 0.0;
-		List<Packet> pktQueue = new ArrayList<Packet>();
+		LinkedList<Packet> pktQueue = new LinkedList<Packet>();
 		
 		for(int i = 0; i < totalNumOfPkts; i++){
 			String uuid = UUID.randomUUID().toString().replaceAll("-", "");
