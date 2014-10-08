@@ -22,6 +22,11 @@ public class FIFORouter implements Simulator {
 	
 	private int expNumber;
 	
+	/**
+	 * Constructor
+	 * @param expNumber experiment number
+	 * @throws Exception Source Type Error.
+	 */
 	public FIFORouter(int expNumber) throws Exception{
 		this.flows = new IncomingFlows(expNumber).getIncomingFlows();
 		this.expNumber = expNumber;
@@ -36,9 +41,6 @@ public class FIFORouter implements Simulator {
 	
 	@Override
 	public void initSchedule(){
-		// schedule first monitor
-//		this.schedule.add(new Event(0.0,Constants.LOG));
-		
 		// schedule first birth
 		Packet firstPkt = this.FIFOPkts.poll();
 		double pktArrivaltime = firstPkt.getPktArrivalTime();
@@ -108,6 +110,11 @@ public class FIFORouter implements Simulator {
 		
 	}
 	
+	/**
+	 * Find the first birth event in the schedule.
+	 * @param schedule LinkedList<Event>
+	 * @return Event
+	 */
 	private Event findNextBirthEventInSchedule(LinkedList<Event> schedule){
 		LinkedList<Event> temp = new LinkedList<Event>(schedule);
 		Event e = temp.poll();
