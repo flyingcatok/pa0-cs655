@@ -43,6 +43,9 @@ public class Flow {
 		}else{
 			throw new Exception("Source Type Error.");
 		}
+		
+		// generate pkts
+		generatePakets();
 	}
 	
 	/**
@@ -76,7 +79,7 @@ public class Flow {
 	 * Generate packets from this source.
 	 * @return List<Packet>
 	 */
-	public void generatePakets(){
+	private void generatePakets(){
 		double lastPktArrivalTime = 0.0;
 		LinkedList<Packet> pktQueue = new LinkedList<Packet>();
 		
@@ -89,11 +92,11 @@ public class Flow {
 			pktQueue.add(pkt);
 			lastPktArrivalTime = curPktArrivalTime;
 		}
-
+		this.pkts = pktQueue;
 	}
 	
 	@Override
 	public String toString(){
-		return sourceType + "\t" + "avg pkt size: " + avgPktSize + "bits" + "\t" + "avg interarrival time: " + avgInterarrivalTime;
+		return "Flow Id: " + this.flowId + "\t" + this.sourceType + "\t" + "avg pkt size: " + avgPktSize + "bits" + "\t" + "avg interarrival time: " + avgInterarrivalTime;
 	}
 }

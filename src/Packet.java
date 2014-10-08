@@ -70,7 +70,7 @@ public class Packet implements Comparable<Packet> {
 	
 	@Override
 	public String toString(){
-		return pktId + "\t" + pktSize + "\t\t" + "@" + pktArrivalTime;
+		return this.flowId + "\t" + this.pktSize + "\t\t" + "@" + this.pktArrivalTime;
 	}
 
 	@Override

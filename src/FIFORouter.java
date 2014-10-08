@@ -36,7 +36,7 @@ public class FIFORouter implements Simulator {
 			temp.addAll(this.flows.get(i).getPkts());
 		}
 		Collections.sort(temp);
-		this.FIFOPkts = new LinkedList<Packet>( temp.subList(0, 10));
+		this.FIFOPkts = new LinkedList<Packet>( temp);
 	}
 	
 	@Override
@@ -69,7 +69,7 @@ public class FIFORouter implements Simulator {
 			this.schedule.add(nextBirthEvent);
 			Collections.sort(this.schedule);
 		}
-			
+
 	}
 	
 	@Override
@@ -133,7 +133,7 @@ public class FIFORouter implements Simulator {
 		
 		// print
 		// label of MM1
-		String ith = "exp_" + this.expNumber+ "";
+		String ith = "FIFO_"+"exp_" + this.expNumber+ "";
 		try {
 			PrintWriter writer = new PrintWriter(ith.concat("_schedule.txt"), "UTF-8");
 		
