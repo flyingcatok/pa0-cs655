@@ -62,7 +62,7 @@ public class Event implements Comparable<Event> {
 	
 	@Override
 	public String toString(){
-		return this.scheduledTime + "\t|\t" + this.eventName;
+		return this.scheduledTime + "\t|\t" + this.eventName + "\t|\t" + this.packet.toString();
 	}
 	
 }

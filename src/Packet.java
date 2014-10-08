@@ -53,7 +53,7 @@ public class Packet implements Comparable<Packet> {
 	
 	@Override
 	public String toString(){
-		return pktId + "\t" + pktSize + "bits" + "\t" + "@" + pktArrivalTime;
+		return pktId + "\t" + pktSize + "\t\t" + "@" + pktArrivalTime;
 	}
 
 	@Override

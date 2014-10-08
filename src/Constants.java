@@ -10,7 +10,7 @@
 public final class Constants {
 	
 	// package events
-	public static final String PKT_ARV = "PKT_ARV";
+	public static final String PKT_ARV = "PKT_ARVED";
 	public static final String PKT_TXED = "PKT_TXED";
 	public static final String LOG = "LOG";
 	
