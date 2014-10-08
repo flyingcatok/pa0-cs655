@@ -18,10 +18,12 @@ public class Flow {
 	 * @param expNumber experiment number
 	 * @param flowType TELNET, FTP or ROGUE
 	 * @param pktsTotal number of packets generated.
+	 * @param flowId flow id
 	 * @throws Exception Source Type Error.
 	 */
-	public Flow(int expNumber, String flowType, int pktsTotal) throws Exception{
+	public Flow(int expNumber, String flowType, int pktsTotal, int flowId) throws Exception{
 		this.pkts = new Source(expNumber, flowType).generatePakets(pktsTotal);
+		this.flowId = flowId;
 	}
 	
 	/**

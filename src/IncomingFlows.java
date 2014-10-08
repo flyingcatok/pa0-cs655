@@ -12,17 +12,17 @@ public class IncomingFlows {
 	 */
 	public IncomingFlows(int expNumber, int total) throws Exception{
 		// initialize source pkts
-		Flow f0 = new Flow(expNumber, Constants.TELNET, total);
-		Flow f1 = new Flow(expNumber, Constants.TELNET, total);
-		Flow f2 = new Flow(expNumber, Constants.TELNET, total);
-		Flow f3 = new Flow(expNumber, Constants.TELNET, total);
-		Flow f4 = new Flow(expNumber, Constants.FTP, total);
-		Flow f5 = new Flow(expNumber, Constants.FTP, total);
-		Flow f6 = new Flow(expNumber, Constants.FTP, total);
-		Flow f7 = new Flow(expNumber, Constants.FTP, total);
-		Flow f8 = new Flow(expNumber, Constants.FTP, total);
-		Flow f9 = new Flow(expNumber, Constants.FTP, total);
-		Flow f10 = new Flow(expNumber, Constants.ROGUE, total);
+		Flow f0 = new Flow(expNumber, Constants.TELNET, total, 0);
+		Flow f1 = new Flow(expNumber, Constants.TELNET, total, 1);
+		Flow f2 = new Flow(expNumber, Constants.TELNET, total, 2);
+		Flow f3 = new Flow(expNumber, Constants.TELNET, total, 3);
+		Flow f4 = new Flow(expNumber, Constants.FTP, total, 4);
+		Flow f5 = new Flow(expNumber, Constants.FTP, total, 5);
+		Flow f6 = new Flow(expNumber, Constants.FTP, total, 6);
+		Flow f7 = new Flow(expNumber, Constants.FTP, total, 7);
+		Flow f8 = new Flow(expNumber, Constants.FTP, total, 8);
+		Flow f9 = new Flow(expNumber, Constants.FTP, total, 9);
+		Flow f10 = new Flow(expNumber, Constants.ROGUE, total, 10);
 
 		// add all flows together
 		this.incomingFlows.add(f0);
