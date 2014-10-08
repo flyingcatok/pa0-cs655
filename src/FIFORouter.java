@@ -36,7 +36,7 @@ public class FIFORouter implements Simulator {
 			temp.addAll(this.flows.get(i));
 		}
 		Collections.sort(temp);
-		this.FIFOPkts = new LinkedList<Packet>( temp.subList(0, Constants.TOTAL_PKTS_IN_SIMULATION));
+		this.FIFOPkts = new LinkedList<Packet>( temp.subList(0, 10));
 	}
 	
 	@Override
@@ -97,7 +97,7 @@ public class FIFORouter implements Simulator {
 			Collections.sort(this.schedule);
 		}else{
 			if(this.schedule.size() != 0){
-				Packet nextPkt = findNextBirthEventInSchedule(this.schedule).getPacket();
+				Packet nextPkt = getNextBirthEventInSchedule(this.schedule).getPacket();
 				double nextBirthTime = nextPkt.getPktArrivalTime();
 				double nextDeathTime = Math.max(nextBirthTime, transmissionEndTime);
 				Event nextDeathEvent = new Event(nextDeathTime, Constants.PKT_TXED);
@@ -115,13 +115,13 @@ public class FIFORouter implements Simulator {
 	 * @param schedule LinkedList<Event>
 	 * @return Event
 	 */
-	private Event findNextBirthEventInSchedule(LinkedList<Event> schedule){
+	private Event getNextBirthEventInSchedule(LinkedList<Event> schedule){
 		LinkedList<Event> temp = new LinkedList<Event>(schedule);
 		Event e = temp.poll();
 		if(e.getEventName().equals(Constants.PKT_ARV)){
 			return e;
 		}else{
-			return findNextBirthEventInSchedule(temp);
+			return getNextBirthEventInSchedule(temp);
 		}
 		
 	}
