@@ -16,7 +16,7 @@ public class FIFORouter implements Simulator {
 
 	private LinkedList<Event> schedule = new LinkedList<Event>();
 	private LinkedList<Packet> FIFOQueue = new LinkedList<Packet>();
-	private List<LinkedList<Packet>> flows;
+	private List<Flow> flows;
 
 	private LinkedList<Packet> FIFOPkts = new LinkedList<Packet>();
 	
@@ -28,12 +28,12 @@ public class FIFORouter implements Simulator {
 	 * @throws Exception Source Type Error.
 	 */
 	public FIFORouter(int expNumber) throws Exception{
-		this.flows = new IncomingFlows(expNumber).getIncomingFlows();
+		this.flows = new IncomingFlows(expNumber, Constants.TOTAL_PKTS_IN_SIMULATION).getIncomingFlows();
 		this.expNumber = expNumber;
 		// initialize FIFO pkts
 		LinkedList<Packet> temp = new LinkedList<Packet>();
 		for(int i = 0; i < this.flows.size(); i++){
-			temp.addAll(this.flows.get(i));
+			temp.addAll(this.flows.get(i).getPkts());
 		}
 		Collections.sort(temp);
 		this.FIFOPkts = new LinkedList<Packet>( temp.subList(0, 10));

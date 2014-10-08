@@ -1,6 +1,4 @@
-import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
@@ -22,7 +20,7 @@ public class Source {
 	 * Constructor.
 	 * @param expNumber experiment number
 	 * @param sourceType TELNET, FTP or ROGUE
-	 * @throws Exception
+	 * @throws Exception Source Type Error.
 	 */
 	public Source(int expNumber, String sourceType) throws Exception{
 		this.sourceType = sourceType;
