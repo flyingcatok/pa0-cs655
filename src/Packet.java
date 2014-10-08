@@ -12,6 +12,7 @@ public class Packet implements Comparable<Packet> {
 	private String pktId; // 32 bit UUID
 	private int pktSize; // bits
 	private double pktArrivalTime;
+	private int flowId;
 	
 	/**
 	 * 
@@ -49,6 +50,22 @@ public class Packet implements Comparable<Packet> {
 	 */
 	public double getPktArrivalTime(){
 		return this.pktArrivalTime;
+	}
+	
+	/**
+	 * Getter for flowId.
+	 * @return int
+	 */
+	public int getFlowId(){
+		return this.flowId;
+	}
+	
+	/**
+	 * Setter for flowId.
+	 * @param flowId int
+	 */
+	public void setFlowId(int flowId){
+		this.flowId = flowId;
 	}
 	
 	@Override
