@@ -1,9 +1,9 @@
 CS655 Computer Networks PA 0
 ============================
 Author: Feiyu Shi, Rakshit Sachdev
-———————————————————————————————
+----------------------------------
 Simulator Design
-————————————————
+----------------
 This project is built upon object-oriented design pattern. 
 We have the following classes and interfaces to depict the whole system:
 * Constants: a place to hold all the constants in the project.
@@ -24,11 +24,11 @@ A simulator also has the following behaviors: initializing schedule, doing somet
 When a birth event happens, we need to add the packet into the queue and schedule the next birth event. When a death event happens, we need to dequeue the packet and send it out of the system, and schedule the next death event. In the controller, each time it pop one event in the schedule and execute it and pop the next event. When there is no event in the schedule, the simulator is stopped.
 
 Statistics Collection
-——————————————————————
+---------------------
 We measured the throughput and the average latency (queuing delay) of each flow. We collect these measurements for different total offered load M = 0.4 to 2.0. 
 
 How to Run the Simulator
-——————————————————————————
+------------------------
 * Compile: make
 * Execute: java Experiment
 * Clean: make clean
