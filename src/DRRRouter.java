@@ -4,6 +4,14 @@ import java.io.UnsupportedEncodingException;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+
+/**
+ * DRR Router
+ * @author Rakshit Sachdev
+ * @collaborator Feiyu Shi
+ * @Date: 10/8/2014
+ *
+ */
 public class DRRRouter implements Simulator {
 
 	private LinkedList<Event> schedule = new LinkedList<Event>();
@@ -35,14 +43,10 @@ public class DRRRouter implements Simulator {
 	}
 	
 	private double[] getFirstPacketArrivalTimeFromFlows(){
-//		List<Packet> temp = new ArrayList<Packet>(this.flows.size());
 		double[] temp = new double[this.sourceQueues.size()];
 		for(int i = 0; i< this.sourceQueues.size();i++){
 			temp[i] = this.sourceQueues.get(i).getPkts().peek().getPktArrivalTime();
-//			temp.add(this.flows.get(i).getPkts().peek());
 		}
-//		Collections.sort(temp);
-//		return temp.get(0);
 		return temp;
 		
 	}

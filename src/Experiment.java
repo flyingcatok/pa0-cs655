@@ -1,4 +1,11 @@
 
+/**
+ * Experiments
+ * @author Feiyu Shi
+ * @collaborator Rakshit Sachdev
+ * @Date: 10/8/2014
+ *
+ */
 public class Experiment {
 
 	public static void main(String[] args) throws Exception {
