@@ -35,6 +35,6 @@ public final class Constants {
 	public final static String DRR = "DRR";
 	
 	// simulation
-	public final static int TOTAL_PKTS_IN_SIMULATION = 100000;
+	public final static int TOTAL_PKTS_IN_SIMULATION = 1000;
 	
 }

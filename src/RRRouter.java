@@ -26,6 +26,7 @@ public class RRRouter implements Simulator {
 	private double[] lastEventTime;
 	private double[] tput;
 	private long[] totalBits;
+	private double[] avgLatency;
 	
 	/**
 	 * Constructor
@@ -33,13 +34,15 @@ public class RRRouter implements Simulator {
 	 * @throws Exception Source Type Error.
 	 */
 	public RRRouter(int expNumber) throws Exception{
-
-		this.flows = new IncomingFlows(expNumber, 500).getIncomingFlows();
+		
+		this.flows = new IncomingFlows(expNumber, Constants.TOTAL_PKTS_IN_SIMULATION).getIncomingFlows();
 		this.expNumber = expNumber;
 		this.lastEventTime = new double[this.flows.size()];
 		this.tput = new double[this.flows.size()];
 		this.firstEventTime = getFirstPacketArrivalTimeFromFlows();
 		this.totalBits = new long[this.flows.size()];
+		this.avgLatency = new double[this.flows.size()];
+		
 		LinkedList<Packet> temp = new LinkedList<Packet>();
 		for(int i = 0; i < this.flows.size(); i++){
 			LinkedList<Packet> t = this.flows.get(i).getPkts();
@@ -83,6 +86,12 @@ public class RRRouter implements Simulator {
 		double departureTimeOfLastPkt = this.lastEventTime[flowId];
 		
 		return totalBits/(departureTimeOfLastPkt - arrivalTimeOfFirstPkt);
+		
+	}
+	
+	private double getAvgLatencyForEachFlow(int flowId, double latency){
+		this.avgLatency[flowId] += latency;
+		return expNumber;
 		
 	}
 	
@@ -132,6 +141,10 @@ public class RRRouter implements Simulator {
 		
 		// add departure time to list
 		this.lastEventTime[currFlowId] = transmissionEndTime;
+		
+		// latency
+		double latency = timeOnSchedule - pkt.getPktArrivalTime();
+		this.avgLatency[currFlowId] += latency;
 		
 		// schedule next death event
 		int nextFlowId = (currFlowId + 1) % this.flows.size();
@@ -213,20 +226,25 @@ public class RRRouter implements Simulator {
 					}
 				}
 			}
-			writer.println("<---------- End of RR router queuing system schedule ---------->");
+			writer.println("<-------------------- End of RR router queuing system schedule -------------------->");
 			writer.close();
 			
 			// compute statistics
 			// write to file
 			PrintWriter writer1 = new PrintWriter(ith.concat("_statistics.txt"), "UTF-8");
-						
+			writer1.println("<---------- RR router queuing system statistics ---------->");
+			//tput
 			double totalTput = 0;
 			for(Flow f: this.flows){
 				this.tput[f.getFlowId()] = getThroughput(f);
-				writer1.println("tput of flow "+f.getFlowId()+": "+this.tput[f.getFlowId()]);
+				writer1.println("tput of flow "+f.getFlowId()+": \t"+this.tput[f.getFlowId()]);
 				totalTput += this.tput[f.getFlowId()];
+				this.avgLatency[f.getFlowId()] /= Constants.TOTAL_PKTS_IN_SIMULATION;
+				writer1.println("avg lantency of flow "+f.getFlowId()+": "+ this.avgLatency[f.getFlowId()]);
 			}
-			writer1.println("total tput: "+totalTput);
+			
+			writer1.println("total tput: \t\t"+totalTput);
+			writer1.println("<---------- End of RR router queuing system statistics ---------->");
 			writer1.close();
 			
 		} catch (FileNotFoundException e1) {
