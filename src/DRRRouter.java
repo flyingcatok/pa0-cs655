@@ -16,14 +16,16 @@ public class DRRRouter implements Simulator {
 	private double[] lastEventTime;
 	private double[] tput;
 	private long[] totalBits;
+	private double[] avgLatency;
 	
 	public DRRRouter(int expNumber) throws Exception{
-		this.sourceQueues = new IncomingFlows(expNumber, 10000).getIncomingFlows();
+		this.sourceQueues = new IncomingFlows(expNumber, 1000).getIncomingFlows();
 		this.expNumber = expNumber;
 		this.lastEventTime = new double[this.sourceQueues.size()];
 		this.tput = new double[this.sourceQueues.size()];
 		this.firstEventTime = getFirstPacketArrivalTimeFromFlows();
 		this.totalBits = new long[this.sourceQueues.size()];
+		this.avgLatency = new double[this.sourceQueues.size()];
 		LinkedList<Packet> temp = new LinkedList<Packet>();
 		for(int i = 0; i < this.sourceQueues.size(); i++){
 			LinkedList<Packet> t = this.sourceQueues.get(i).getPkts();
@@ -110,6 +112,9 @@ public class DRRRouter implements Simulator {
 		double timeOnSchedule = deathEvent.getScheduledTime();
 		double transmissionEndTime = timeOnSchedule + pkt.getpktSize() / Constants.TRANSMISSION_RATE;
 		this.lastEventTime[currFlowId] = transmissionEndTime;
+		// latency
+		double latency = timeOnSchedule - pkt.getPktArrivalTime();
+		this.avgLatency[currFlowId] += latency;
 		// schedule next death event
 		checkSameQueueForDeathEvent(currFlowId, transmissionEndTime);
 		//checkNextQueueForDeathEvent(currFlowId, transmissionEndTime);
@@ -238,12 +243,20 @@ public class DRRRouter implements Simulator {
 			PrintWriter writer1 = new PrintWriter(ith.concat("_statistics.txt"), "UTF-8");
 						
 			double totalTput = 0;
+			double avgLatencyForAllSrcs = 0;
 			for(Flow f: this.sourceQueues){
 				this.tput[f.getFlowId()] = getThroughput(f);
-				writer1.println("tput of flow "+f.getFlowId()+": "+this.tput[f.getFlowId()]);
+				//writer1.println("tput of flow "+f.getFlowId()+": "+this.tput[f.getFlowId()]);
 				totalTput += this.tput[f.getFlowId()];
+				this.avgLatency[f.getFlowId()] /= Constants.TOTAL_PKTS_IN_SIMULATION;
+				writer1.println("avg lantency of flow "+f.getFlowId()+": "+ this.avgLatency[f.getFlowId()]);
 			}
-			writer1.println("total tput: "+totalTput);
+			for(int i=0; i<this.avgLatency.length;i++){
+				avgLatencyForAllSrcs += this.avgLatency[i];
+			}
+			avgLatencyForAllSrcs /= this.sourceQueues.size();
+			//writer1.println("avg lantency of all flows: " + avgLatencyForAllSrcs);
+			//writer1.println("total tput: "+totalTput);
 			writer1.close();
 			
 		} catch (FileNotFoundException e1) {
