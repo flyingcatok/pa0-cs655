@@ -250,7 +250,7 @@ public class DRRRouter implements Simulator {
 			double avgLatencyForAllSrcs = 0;
 			for(Flow f: this.sourceQueues){
 				this.tput[f.getFlowId()] = getThroughput(f);
-				//writer1.println("tput of flow "+f.getFlowId()+": "+this.tput[f.getFlowId()]);
+				writer1.println("tput of flow "+f.getFlowId()+": "+this.tput[f.getFlowId()]);
 				totalTput += this.tput[f.getFlowId()];
 				this.avgLatency[f.getFlowId()] /= Constants.TOTAL_PKTS_IN_SIMULATION;
 				writer1.println("avg lantency of flow "+f.getFlowId()+": "+ this.avgLatency[f.getFlowId()]);
@@ -259,8 +259,8 @@ public class DRRRouter implements Simulator {
 				avgLatencyForAllSrcs += this.avgLatency[i];
 			}
 			avgLatencyForAllSrcs /= this.sourceQueues.size();
-			//writer1.println("avg lantency of all flows: " + avgLatencyForAllSrcs);
-			//writer1.println("total tput: "+totalTput);
+			writer1.println("avg lantency of all flows: " + avgLatencyForAllSrcs);
+			writer1.println("total tput: "+totalTput);
 			writer1.close();
 			
 		} catch (FileNotFoundException e1) {
