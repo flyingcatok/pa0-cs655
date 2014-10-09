@@ -22,6 +22,7 @@ public class RRRouter implements Simulator {
 	private List<Flow> flows;
 	private LinkedList<Packet> RRPkts = new LinkedList<Packet>();
 	private int expNumber;
+	
 	private double[] firstEventTime;
 	private double[] lastEventTime;
 	private double[] tput;
@@ -37,6 +38,7 @@ public class RRRouter implements Simulator {
 		
 		this.flows = new IncomingFlows(expNumber, Constants.TOTAL_PKTS_IN_SIMULATION).getIncomingFlows();
 		this.expNumber = expNumber;
+		
 		this.lastEventTime = new double[this.flows.size()];
 		this.tput = new double[this.flows.size()];
 		this.firstEventTime = getFirstPacketArrivalTimeFromFlows();
@@ -58,14 +60,10 @@ public class RRRouter implements Simulator {
 	 * @return Packet
 	 */
 	private double[] getFirstPacketArrivalTimeFromFlows(){
-//		List<Packet> temp = new ArrayList<Packet>(this.flows.size());
 		double[] temp = new double[this.flows.size()];
 		for(int i = 0; i< this.flows.size();i++){
 			temp[i] = this.flows.get(i).getPkts().peek().getPktArrivalTime();
-//			temp.add(this.flows.get(i).getPkts().peek());
 		}
-//		Collections.sort(temp);
-//		return temp.get(0);
 		return temp;
 		
 	}
@@ -86,12 +84,6 @@ public class RRRouter implements Simulator {
 		double departureTimeOfLastPkt = this.lastEventTime[flowId];
 		
 		return totalBits/(departureTimeOfLastPkt - arrivalTimeOfFirstPkt);
-		
-	}
-	
-	private double getAvgLatencyForEachFlow(int flowId, double latency){
-		this.avgLatency[flowId] += latency;
-		return expNumber;
 		
 	}
 	
@@ -235,6 +227,7 @@ public class RRRouter implements Simulator {
 			writer1.println("<---------- RR router queuing system statistics ---------->");
 			//tput
 			double totalTput = 0;
+			double avgLatencyForAllSrcs = 0;
 			for(Flow f: this.flows){
 				this.tput[f.getFlowId()] = getThroughput(f);
 				writer1.println("tput of flow "+f.getFlowId()+": \t"+this.tput[f.getFlowId()]);
@@ -242,7 +235,11 @@ public class RRRouter implements Simulator {
 				this.avgLatency[f.getFlowId()] /= Constants.TOTAL_PKTS_IN_SIMULATION;
 				writer1.println("avg lantency of flow "+f.getFlowId()+": "+ this.avgLatency[f.getFlowId()]);
 			}
-			
+			for(int i=0; i<this.avgLatency.length;i++){
+				avgLatencyForAllSrcs += this.avgLatency[i];
+			}
+			avgLatencyForAllSrcs /= this.flows.size();
+			writer1.println("avg lantency of all flows: " + avgLatencyForAllSrcs);
 			writer1.println("total tput: \t\t"+totalTput);
 			writer1.println("<---------- End of RR router queuing system statistics ---------->");
 			writer1.close();
@@ -253,5 +250,4 @@ public class RRRouter implements Simulator {
 			e1.printStackTrace();
 		}
 	}
-
 }

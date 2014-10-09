@@ -22,6 +22,12 @@ public class FIFORouter implements Simulator {
 	
 	private int expNumber;
 	
+	private double[] firstEventTime;
+	private double[] lastEventTime;
+	private double[] tput;
+	private long[] totalBits;
+	private double[] avgLatency;
+	
 	/**
 	 * Constructor
 	 * @param expNumber experiment number
@@ -30,13 +36,49 @@ public class FIFORouter implements Simulator {
 	public FIFORouter(int expNumber) throws Exception{
 		this.flows = new IncomingFlows(expNumber, Constants.TOTAL_PKTS_IN_SIMULATION).getIncomingFlows();
 		this.expNumber = expNumber;
+		
+		this.lastEventTime = new double[this.flows.size()];
+		this.tput = new double[this.flows.size()];
+		this.firstEventTime = getFirstPacketArrivalTimeFromFlows();
+		this.totalBits = new long[this.flows.size()];
+		this.avgLatency = new double[this.flows.size()];
+		
 		// initialize FIFO pkts
 		LinkedList<Packet> temp = new LinkedList<Packet>();
 		for(int i = 0; i < this.flows.size(); i++){
 			temp.addAll(this.flows.get(i).getPkts());
+			this.totalBits[i] = getLoadForEachFlow(this.flows.get(i));
 		}
 		Collections.sort(temp);
 		this.FIFOPkts = new LinkedList<Packet>( temp);
+	}
+	
+	private double[] getFirstPacketArrivalTimeFromFlows(){
+		double[] temp = new double[this.flows.size()];
+		for(int i = 0; i< this.flows.size();i++){
+			temp[i] = this.flows.get(i).getPkts().peek().getPktArrivalTime();
+		}
+		return temp;
+		
+	}
+	
+	private long getLoadForEachFlow(Flow flow){
+		long totalBits = 0;
+		int sz = flow.getPkts().size();
+		for(int i = 0; i < sz; i++){
+			totalBits += flow.getPkts().get(i).getpktSize();
+		}
+		return totalBits;
+	}
+	
+	private double getThroughput(Flow flow){
+		int flowId = flow.getFlowId();
+		double arrivalTimeOfFirstPkt = this.firstEventTime[flowId];
+		long totalBits = this.totalBits[flowId];
+		double departureTimeOfLastPkt = this.lastEventTime[flowId];
+		
+		return totalBits/(departureTimeOfLastPkt - arrivalTimeOfFirstPkt);
+		
 	}
 	
 	@Override
@@ -76,6 +118,7 @@ public class FIFORouter implements Simulator {
 	public void death(Event deathEvent){
 		// remove the pkt from queue
 		Packet pkt = this.FIFOQueue.poll();
+		int currFlowId = pkt.getFlowId();
 		
 		// pkt should be equal to pkt from event
 		Packet pkt2 = deathEvent.getPacket();
@@ -84,8 +127,16 @@ public class FIFORouter implements Simulator {
 			System.out.println("Pkts in FIFO queue is not the same as pkts in event.");
 		}
 
-		double transmissionEndTime = deathEvent.getScheduledTime() + pkt.getpktSize() / Constants.TRANSMISSION_RATE;
+		double timeOnSchedule = deathEvent.getScheduledTime();
+		double transmissionEndTime = timeOnSchedule + pkt.getpktSize() / Constants.TRANSMISSION_RATE;
 
+		// add departure time to list
+		this.lastEventTime[currFlowId] = transmissionEndTime;
+				
+		// latency
+		double latency = timeOnSchedule - pkt.getPktArrivalTime();
+		this.avgLatency[currFlowId] += latency;
+				
 		// schedule next death event
 		if(this.FIFOQueue.size() != 0){
 			Packet nextPkt = this.FIFOQueue.peek();
@@ -162,6 +213,30 @@ public class FIFORouter implements Simulator {
 			}
 			writer.println("<---------- End of FIFO router queuing system schedule ---------->");
 			writer.close();
+			
+			// compute statistics
+			// write to file
+			PrintWriter writer1 = new PrintWriter(ith.concat("_statistics.txt"), "UTF-8");
+			writer1.println("<---------- FIFO router queuing system statistics ---------->");
+			//tput
+			double totalTput = 0;
+			double avgLatencyForAllSrcs = 0;
+			for(Flow f: this.flows){
+				this.tput[f.getFlowId()] = getThroughput(f);
+				writer1.println("tput of flow "+f.getFlowId()+": \t"+this.tput[f.getFlowId()]);
+				totalTput += this.tput[f.getFlowId()];
+				this.avgLatency[f.getFlowId()] /= Constants.TOTAL_PKTS_IN_SIMULATION;
+				writer1.println("avg lantency of flow "+f.getFlowId()+": "+ this.avgLatency[f.getFlowId()]);
+			}
+			for(int i=0; i<this.avgLatency.length;i++){
+				avgLatencyForAllSrcs += this.avgLatency[i];
+			}
+			avgLatencyForAllSrcs /= this.flows.size();
+			writer1.println("avg lantency of all flows: " + avgLatencyForAllSrcs);
+			writer1.println("total tput: \t\t"+totalTput);
+			writer1.println("<---------- End of FIFO router queuing system statistics ---------->");
+			writer1.close();
+						
 		} catch (FileNotFoundException e1) {
 			e1.printStackTrace();
 		} catch (UnsupportedEncodingException e1) {

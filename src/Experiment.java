@@ -2,7 +2,12 @@
 public class Experiment {
 
 	public static void main(String[] args) throws Exception {
-		FIFORouter fifo = new FIFORouter(0);
-		fifo.controller();
+		for(int i = 0; i<9; i++){
+			FIFORouter fifo = new FIFORouter(i);
+			fifo.controller();
+			RRRouter rr = new RRRouter(i);// 0-8
+			rr.controller();
+		}
+
 	}
 }
