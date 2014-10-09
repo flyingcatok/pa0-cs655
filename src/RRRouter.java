@@ -1,6 +1,8 @@
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -20,6 +22,10 @@ public class RRRouter implements Simulator {
 	private List<Flow> flows;
 	private LinkedList<Packet> RRPkts = new LinkedList<Packet>();
 	private int expNumber;
+	private double[] firstEventTime;
+	private double[] lastEventTime;
+	private double[] tput;
+	private long[] totalBits;
 	
 	/**
 	 * Constructor
@@ -27,31 +33,58 @@ public class RRRouter implements Simulator {
 	 * @throws Exception Source Type Error.
 	 */
 	public RRRouter(int expNumber) throws Exception{
-//		this.totalPktInSystem = 0;
-		this.flows = new IncomingFlows(expNumber, 5).getIncomingFlows();
+
+		this.flows = new IncomingFlows(expNumber, 500).getIncomingFlows();
 		this.expNumber = expNumber;
+		this.lastEventTime = new double[this.flows.size()];
+		this.tput = new double[this.flows.size()];
+		this.firstEventTime = getFirstPacketArrivalTimeFromFlows();
+		this.totalBits = new long[this.flows.size()];
 		LinkedList<Packet> temp = new LinkedList<Packet>();
 		for(int i = 0; i < this.flows.size(); i++){
 			LinkedList<Packet> t = this.flows.get(i).getPkts();
 			temp.addAll(t);
+			this.totalBits[i] = getLoadForEachFlow(this.flows.get(i));
 		}
 		Collections.sort(temp);
 		this.RRPkts = new LinkedList<Packet>(temp);
 	}
 	
-//	/**
-//	 * Determine which packet is the first to come
-//	 * @return Packet
-//	 */
-//	private Packet getFirstPacketFromFlows(){
+	/**
+	 * Determine which packet is the first to come
+	 * @return Packet
+	 */
+	private double[] getFirstPacketArrivalTimeFromFlows(){
 //		List<Packet> temp = new ArrayList<Packet>(this.flows.size());
-//		for(int i = 0; i< this.flows.size();i++){
+		double[] temp = new double[this.flows.size()];
+		for(int i = 0; i< this.flows.size();i++){
+			temp[i] = this.flows.get(i).getPkts().peek().getPktArrivalTime();
 //			temp.add(this.flows.get(i).getPkts().peek());
-//		}
+		}
 //		Collections.sort(temp);
 //		return temp.get(0);
-//		
-//	}
+		return temp;
+		
+	}
+	
+	private long getLoadForEachFlow(Flow flow){
+		long totalBits = 0;
+		int sz = flow.getPkts().size();
+		for(int i = 0; i < sz; i++){
+			totalBits += flow.getPkts().get(i).getpktSize();
+		}
+		return totalBits;
+	}
+	
+	private double getThroughput(Flow flow){
+		int flowId = flow.getFlowId();
+		double arrivalTimeOfFirstPkt = this.firstEventTime[flowId];
+		long totalBits = this.totalBits[flowId];
+		double departureTimeOfLastPkt = this.lastEventTime[flowId];
+		
+		return totalBits/(departureTimeOfLastPkt - arrivalTimeOfFirstPkt);
+		
+	}
 	
 	@Override
 	public void initSchedule() {
@@ -66,6 +99,8 @@ public class RRRouter implements Simulator {
 		Event death = new Event(pktArrivaltime, Constants.PKT_TXED);
 		death.setPacket(firstPkt);
 		this.schedule.add(death);
+		//
+//		this.lastEventTime.add(firstPkt.getFlowId(), pktArrivaltime);
 	}
 
 	@Override
@@ -94,7 +129,10 @@ public class RRRouter implements Simulator {
 		// get transmission End Time
 		double timeOnSchedule = deathEvent.getScheduledTime();
 		double transmissionEndTime = timeOnSchedule + pkt.getpktSize() / Constants.TRANSMISSION_RATE;
-
+		
+		// add departure time to list
+		this.lastEventTime[currFlowId] = transmissionEndTime;
+		
 		// schedule next death event
 		int nextFlowId = (currFlowId + 1) % this.flows.size();
 		checkNextQueueForDeathEvent(nextFlowId, transmissionEndTime, 1);
@@ -153,8 +191,8 @@ public class RRRouter implements Simulator {
 			PrintWriter writer = new PrintWriter(ith.concat("_schedule.txt"), "UTF-8");
 				
 			writer.println("<-------------------- RR router queuing system schedule -------------------->");
-			writer.println("Time"+"\t\t\t|\t"+"Event"+"\t\t|\t"+"Flow ID"+"\t\t\t\t\t"+"Pkt Size"+"\t"+"Pkt Arrival Time");
-				
+			writer.println("Time"+"\t\t\t|\t"+"Event"+"\t\t|\t"+"Flow ID"+"\t"+"Pkt Size"+"\t"+"Pkt Arrival Time");
+	
 			while(this.schedule.size()!=0){
 				Event currEvent = this.schedule.poll();
 				String currEventName = currEvent.getEventName();
@@ -177,6 +215,20 @@ public class RRRouter implements Simulator {
 			}
 			writer.println("<---------- End of RR router queuing system schedule ---------->");
 			writer.close();
+			
+			// compute statistics
+			// write to file
+			PrintWriter writer1 = new PrintWriter(ith.concat("_statistics.txt"), "UTF-8");
+						
+			double totalTput = 0;
+			for(Flow f: this.flows){
+				this.tput[f.getFlowId()] = getThroughput(f);
+				writer1.println("tput of flow "+f.getFlowId()+": "+this.tput[f.getFlowId()]);
+				totalTput += this.tput[f.getFlowId()];
+			}
+			writer1.println("total tput: "+totalTput);
+			writer1.close();
+			
 		} catch (FileNotFoundException e1) {
 			e1.printStackTrace();
 		} catch (UnsupportedEncodingException e1) {
