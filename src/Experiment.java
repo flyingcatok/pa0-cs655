@@ -7,7 +7,8 @@ public class Experiment {
 			fifo.controller();
 			RRRouter rr = new RRRouter(i);// 0-8
 			rr.controller();
+			DRRRouter drr = new DRRRouter(i);
+			drr.controller();
 		}
-
 	}
 }
