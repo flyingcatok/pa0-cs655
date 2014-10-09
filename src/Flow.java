@@ -18,6 +18,7 @@ public class Flow {
 	private double avgInterarrivalTime;
 	private int pktsTotal;
 	private LinkedList<Packet> pkts = new LinkedList<Packet>();
+	private int defCounter;
 	
 	/**
 	 * Constructor
@@ -31,6 +32,7 @@ public class Flow {
 		this.sourceType = sourceType;
 		this.flowId = flowId;
 		this.pktsTotal = pktsTotal;
+		this.defCounter = Constants.QUANTUM;
 		if(this.sourceType.equals(Constants.TELNET)){
 			this.avgPktSize = Constants.TELNET_PKT_SIZE_AVG;
 			this.avgInterarrivalTime = this.avgPktSize / Constants.TELNET_FTP_DATA_GENERATION_RATE[expNumber];
@@ -62,6 +64,10 @@ public class Flow {
 	 */
 	public LinkedList<Packet> getPkts(){
 		return this.pkts;
+	}
+	
+	public int getDefCounter(){
+		return this.defCounter;
 	}
 	
 	/**
@@ -98,5 +104,9 @@ public class Flow {
 	@Override
 	public String toString(){
 		return "Flow Id: " + this.flowId + "\t" + this.sourceType + "\t" + "avg pkt size: " + avgPktSize + "bits" + "\t" + "avg interarrival time: " + avgInterarrivalTime;
+	}
+
+	public void setDefCounter(int dcount) {
+		this.defCounter = dcount;
 	}
 }

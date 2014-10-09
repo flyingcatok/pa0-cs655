@@ -17,6 +17,7 @@ public final class Constants {
 	// scheduler
 	public static final int IDLE = 102;
 	public static final int BUSY = 103;
+	public static final int QUANTUM = 500;
 	
 	// traffic sources
 	public static final String TELNET = "TELNET";
